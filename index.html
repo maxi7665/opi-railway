@@ -1,8 +1,139 @@
 <html>
   <head>
-    <title>Welcome to Example.com!</title>
+  <meta charset="utf-8">
+    <title>Железная дорога</title>
   </head>
   <body>
-    <h1>Success!  The example.com virtual host is working!</h1>
+
+  
+    <h1>Отправления</h1>
+
+  	<table id = 'tripTable' border ="1px">
+  	<thead><tr><th>Номер</th><th>ОТ</th><th>ДО</th><th>ВРЕМЯ</th><th>ПУТЬ</th></tr></thead>
+	<tbody></tbody>
+  	
+  	</table>
+
+  	ОТ <input type="text" id="source"/><br>
+  	ДО <input type="text" id="destination"/><br>
+  	ВРЕМЯ <input type="text" id="departure_date_time"/><br>
+  	ПУТЬ <input type="text" id="way"/><br>  	
+
+  	<script>
+
+  	
+  	
+  	//alert(window.location.host);
+
+  	apiUrl = 'api.php';
+
+  	reloadTrips();
+
+  	
+  	
+
+  	async function reloadTrips()
+  	{
+  		response = await fetch(apiUrl);
+
+  		trips = await response.json();
+
+  		//alert(trips);
+
+  		tbody = document.getElementById('tripTable').getElementsByTagName('tbody')[0];
+
+  		tbody.innerHTML = '';
+
+  		trips.forEach((trip) => console.log(trip));
+
+  		trips.forEach((trip) => 
+  		{
+			row = tbody.insertRow();
+
+			cell = row.insertCell();
+
+			text = document.createTextNode(trip.id);
+
+			cell.appendChild(text);
+
+			cell = row.insertCell();
+
+			text = document.createTextNode(trip.source);
+
+			cell.appendChild(text);
+
+			cell = row.insertCell();
+
+			text = document.createTextNode(trip.destination);
+
+			cell.appendChild(text);
+
+			cell = row.insertCell();
+
+			text = document.createTextNode(trip.departure_date_time);
+
+			cell.appendChild(text);
+
+			cell = row.insertCell();
+
+			text = document.createTextNode(trip.way);
+
+			cell.appendChild(text);
+
+			cell = row.insertCell();
+
+			bt = document.createElement('button');
+
+			action = 'deleteTrip(' + trip.id + ');';
+
+			bt.setAttribute("onclick", action);
+			bt.innerHTML = 'Удалить';
+
+			cell.appendChild(bt);
+  			
+  			//table.innerHtml += '<tr><td>' + trip.id + '</td></tr>';
+  		}
+  		);
+  		
+  	}
+
+  	async function addTrip()
+  	{
+  		trip = getInput();
+
+  		const rawResponse = await fetch(apiUrl, {
+		    method: 'POST',
+		    headers: {
+		      'Accept': 'application/json',
+		      'Content-Type': 'application/json'
+		    },
+		    body: JSON.stringify(trip)
+		  });
+
+		  await reloadTrips();
+  	}
+
+  	async function deleteTrip(id)
+  	{
+  		$response = await fetch(apiUrl + "?id=" + id, {method: 'DELETE'});
+
+  		$res = await $response.text();
+
+  		await reloadTrips();
+  	}
+
+  	function getInput()
+  	{
+  		return {
+  			source: document.getElementById("source").value,
+  			destination: document.getElementById("destination").value,
+  			departure_date_time: document.getElementById("departure_date_time").value,
+  			way: document.getElementById("way").value};
+  	}
+  	
+  	</script> 
+
+  	<button onclick = "addTrip()">Добавить</button>
+
   </body>
 </html>
